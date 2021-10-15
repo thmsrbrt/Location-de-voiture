@@ -72,4 +72,12 @@ class Vendeur
 
         return $this;
     }
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return "nom : ". $this->getNom().
+            "identifiant : ". $this->getIdentifiant().
+            "mdp : ". $this->getMdp();
+    }
 }

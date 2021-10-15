@@ -28,11 +28,6 @@ class Vehicule
     private $nombre;
 
     /**
-     * @ORM\Column(type="string", length=1024)
-     */
-    private $caractere;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $photo;
@@ -41,6 +36,12 @@ class Vehicule
      * @ORM\Column(type="boolean")
      */
     private $etat;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $caractere;
+
 
     public function getId(): ?int
     {
@@ -71,17 +72,6 @@ class Vehicule
         return $this;
     }
 
-    public function getCaractere(): ?string
-    {
-        return $this->caractere;
-    }
-
-    public function setCaractere(string $caractere): self
-    {
-        $this->caractere = $caractere;
-
-        return $this;
-    }
 
     public function getPhoto(): ?string
     {
@@ -105,5 +95,28 @@ class Vehicule
         $this->etat = $etat;
 
         return $this;
+    }
+
+    public function getCaractere(): ?string
+    {
+        return $this->caractere;
+    }
+
+    public function setCaractere(string $caractere): self
+    {
+        $this->caractere = $caractere;
+
+        return $this;
+    }
+
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return "type : " . $this->getType().
+            "nombre : " . $this->getNombre().
+            "caractere : " . $this->getCaractere().
+            "photo : " . $this->getPhoto().
+            "etat : " . $this->getEtat();
     }
 }

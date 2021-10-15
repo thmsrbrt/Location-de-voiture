@@ -1,0 +1,26 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="row">
+        <form action="{{ path('client_valide_connexion') }}" method="post" class="row g-3 needs-validation">
+            <fieldset class="form-group">
+                <div class="col-md-4">
+                    <legend>Connection</legend>
+                    <label class="form-label">Email :
+                        <input class="form-control" type="email" name="email" size="18" value="" required>
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Mot de passe :
+                        <input class="form-control" type="text" name="password" size="18" value="" required>
+                    </label>
+                </div>
+                    {% if errors.connexion is defined %}
+                        <small class="invalid-feedback">{{ errors.connexion }}</small><br>
+                    {% endif %}
+                    <input class="btn btn-primary" type="submit" name="valideForm" value="Valider">
+            </fieldset>
+        </form>
+        <a href="{{ path('client_inscription') }}">Pas encore inscrit</a>
+    </div>
+{% endblock %}
+

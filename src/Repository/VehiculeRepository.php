@@ -19,6 +19,22 @@ class VehiculeRepository extends ServiceEntityRepository
         parent::__construct($registry, Vehicule::class);
     }
 
+    public function findAllVehicule() {
+        $conexion = $this->getEntityManager()->getConnection();
+        $requete = "SELECT type, nombre, caractere, photo, etat
+        FROM Vehicule 
+        ORDER BY type";
+        try {
+            $prep = $conexion->prepare($requete);
+            $prep->execute();
+            return $prep->fetchAll();
+        }catch (\PDOException $e) {
+            echo $e->getMessage();
+            echo "\n erreur findAllVehicule \n";
+            return array();
+        }
+    }
+
     // /**
     //  * @return Vehicule[] Returns an array of Vehicule objects
     //  */

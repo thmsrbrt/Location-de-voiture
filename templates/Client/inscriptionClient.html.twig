@@ -1,0 +1,59 @@
+{% extends "base.html.twig" %}
+{% block body %}
+    <div class="row">
+        <form action="{{ path('client_valide_form_client') }}" method="post" class="row g-3 needs-validation">
+            <fieldset>
+                <div class="col-md-4">
+                    <legend>Inscription</legend>
+                    <label for="nom">Nom :
+                        <input type="text" name="nom" size="18" value="{{ donnees.nom | default('') }}">
+                    </label>
+                </div>
+                {% if errors.nom is defined %}
+                    <small class="error">{{ errors.nom }}</small><br>
+                {% endif %}
+                <div class="col-md-4">
+                    <label>Prenom :
+                        <input type="text" name="prenom" size="18" value="{{ donnees.prenom | default('') }}">
+                    </label>
+                </div>
+                {% if errors.prenom is defined %}
+                    <small class="cm-error">{{ errors.prenom }}</small><br>
+                {% endif %}
+                <div class="col-md-4">
+                    <label>Pseudo (null possible) :
+                        <input type="text" name="pseudo" size="18" value="{{ donnees.pseudo | default('') }}">
+                    </label><br>
+                </div>
+                    {% if errors.pseudo is defined %}
+                        <small class="error">{{ errors.pseudo }}</small><br>
+                    {% endif %}
+                <div class="col-md-4">
+                    <label>Email :
+                        <input type="email" name="email" size="18" value="{{ donnees.email | default('') }}">
+                    </label>
+                </div>
+                    {% if errors.email is defined %}
+                        <small class="error">{{ errors.email }}</small><br>
+                    {% endif %}
+                <div class="col-md-4">
+                    <label>Mot de passe :
+                        <input type="text" name="password" size="18" value="{{ donnees.password | default('') }}">
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label>Retaper le mot de passe :
+                        <input type="text" name="passwordVerify" size="18" value="{{ donnees.passwordVerify | default('') }}">
+                    </label>
+                </div>
+                    {% if errors.password is defined %}
+                        <small class="error">{{ errors.password }}</small><br>
+                    {% elseif errors.password is  defined %}
+                        <small class="error">{{ errors.passwordVerify }}</small><br>
+                    {% endif %}
+                    <input class="btn btn-primary" type="submit" name="valideForm"/>
+            </fieldset>
+        </form>
+        <a href="{{ path('client_connexion') }}">Déjà inscrit, connecte toi!</a>
+    </div>
+{% endblock %}
