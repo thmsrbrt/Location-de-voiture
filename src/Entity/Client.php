@@ -23,14 +23,14 @@ class Client
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(min={2}, max={255})
-     * @Assert\Type()
+     *
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(min={2}, max={255})
-     * @Assert\Type()
+     *
      */
     private $prenom;
 
@@ -43,13 +43,13 @@ class Client
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(min={8})
-     * @Assert\Type(type="User") //a vérifier
+     *
      */
     private $mdp;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Email()
+     *
      */
     private $email;
 

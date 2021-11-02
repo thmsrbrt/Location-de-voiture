@@ -23,7 +23,7 @@ class Vendeur
     private $nom;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="integer", length=255)
      */
     private $identifiant;
 

@@ -4,7 +4,7 @@
         <form action="{{ path('client_valide_form_client') }}" method="post" class="row g-3 needs-validation">
             <fieldset>
                 <div class="col-md-4">
-                    <legend>Inscription</legend>
+                    <legend>Modification de mon profil</legend>
                     <label for="nom">Nom :
                         <input type="text" name="nom" size="18" value="{{ donnees.nom | default('') }}">
                     </label>
@@ -25,20 +25,20 @@
                         <input type="text" name="pseudo" size="18" value="{{ donnees.pseudo | default('') }}">
                     </label><br>
                 </div>
-                    {% if errors.pseudo is defined %}
-                        <small class="error">{{ errors.pseudo }}</small><br>
-                    {% endif %}
+                {% if errors.pseudo is defined %}
+                    <small class="error">{{ errors.pseudo }}</small><br>
+                {% endif %}
                 <div class="col-md-4">
                     <label>Email :
                         <input type="email" name="email" size="18" value="{{ donnees.email | default('') }}">
                     </label>
                 </div>
-                    {% if errors.email is defined %}
-                        <small class="error">{{ errors.email }}</small><br>
-                    {% endif %}
+                {% if errors.email is defined %}
+                    <small class="error">{{ errors.email }}</small><br>
+                {% endif %}
                 <div class="col-md-4">
                     <label>Mot de passe :
-                        <input type="text" name="password" size="18" value="{{ donnees.password | default('') }}">
+                        <input type="password" name="password" size="18" value="{{ donnees.password | default('') }}">
                     </label>
                 </div>
                 <div class="col-md-4">
@@ -46,14 +46,13 @@
                         <input type="password" name="passwordVerify" size="18" value="{{ donnees.passwordVerify | default('') }}">
                     </label>
                 </div>
-                    {% if errors.password is defined %}
-                        <small class="error">{{ errors.password }}</small><br>
-                    {% elseif errors.password is  defined %}
-                        <small class="error">{{ errors.passwordVerify }}</small><br>
-                    {% endif %}
-                    <input class="btn btn-primary" type="submit" name="valideForm"/>
+                {% if errors.password is defined %}
+                    <small class="error">{{ errors.password }}</small><br>
+                {% elseif errors.password is  defined %}
+                    <small class="error">{{ errors.passwordVerify }}</small><br>
+                {% endif %}
+                <input class="btn btn-primary" type="submit" name="valideForm" value="enregitrer les modifications"/>
             </fieldset>
         </form>
-        <a href="{{ path('client_connexion') }}">Déjà inscrit, connecte toi!</a>
     </div>
 {% endblock %}

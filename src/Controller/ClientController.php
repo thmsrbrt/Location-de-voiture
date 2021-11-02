@@ -6,8 +6,9 @@ use App\Entity\Client;
 use App\Repository\ClientRepository;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\BrowserKit\Cookie;
+
 use Symfony\Component\BrowserKit\CookieJar;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use function PHPUnit\Framework\isEmpty;
@@ -29,38 +30,21 @@ class ClientController extends AbstractController {
         return $this->render('Client/inscriptionClient.html.twig');
     }
 
-    /*
-     * @Route("/Client/inscription", name="client_inscription")
-     * @Route("/Client/add", name="client_connexion")
-     */
-    public function clientAgent(Client $client = null, Request $request, ObjectManager $manager) {
-        if ($client)
-            $client = new Client();
-
-        $form = $this->createForm(Client::class, $client);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($client);
-            $manager->flush();
-
-            $cookie = new Cookie('id', $client, strtotime('+year'));
-            $cookieJar = new CookieJar();
-            $cookieJar->set($cookie);
-
-            $client = new Client([], null, $cookieJar);
-
-            return $this->redirectToRoute('controller_show_vehicule', ['id' => $client->getId()]);
-        }
-
-        return $this->render('Client/ClientAgent.html.twig', ['formulaire' => $form->createView(), 'client' => $client]);
-    }
-
     /**
      * @Route("/Client/connexion", name="client_connexion")
      */
     public function connexionClient(){
         return $this->render('Client/connexionClient.html.twig');
+    }
+
+    /**
+     * @Route("/Client/edit", name="client_edit")
+     */
+    public function editClient(ClientRepository $client){
+        //$donnees = $client->findOneBy();
+        //dd($donnees);
+        $donnees = null;
+        return $this->render('Client/editClient.html.twig', ['donnees' => $donnees]);
     }
 
     /**
@@ -107,11 +91,13 @@ class ClientController extends AbstractController {
         $donnees['password'] = htmlentities($_POST['password']);
 
         if (!empty($donnees['email']) and !empty($donnees['password'])){
-            if (empty($client->findOneBy(['email' => $donnees['email'], 'mdp' => $donnees['password']]))) {
-                $errors['connexion'] = "Email ou mot de passe incorrect";
-                return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
-            } else
+            if (!empty($client->findOneBy(['email' => $donnees['email'], 'mdp' => $donnees['password']]))) {
                 return $this->redirectToRoute('controller_show_vehicule');
+            } else {
+                $errors['connexion'] = "Email ou mot de passe incorrect";
+                //dd($donnees);
+                return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
+            }
         } else
             return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees]);
     }
