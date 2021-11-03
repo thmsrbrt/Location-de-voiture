@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Repository\ClientRepository;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -15,12 +16,17 @@ use function PHPUnit\Framework\isEmpty;
 
 
 class ClientController extends AbstractController {
-    public function __construct(){
+    private $requestStack;
 
+    public function __construct(RequestStack $requestStack){
+        $this->requestStack = $requestStack;
     }
 
+    /**
+     * @Route("/Client", name="client_error")
+     */
     public function index(){
-        return $this->render('base.html.twig', ['controller_name' => 'ClientController']);
+        return $this->redirectToRoute('controller_show_vehicule');
     }
 
     /**
@@ -92,6 +98,10 @@ class ClientController extends AbstractController {
 
         if (!empty($donnees['email']) and !empty($donnees['password'])){
             if (!empty($client->findOneBy(['email' => $donnees['email'], 'mdp' => $donnees['password']]))) {
+                $session = $this->requestStack->getSession();
+                $session->set('email', $donnees['email']);
+                $session->set('password', $donnees['password']);
+                dd($session);
                 return $this->redirectToRoute('controller_show_vehicule');
             } else {
                 $errors['connexion'] = "Email ou mot de passe incorrect";

@@ -22,30 +22,50 @@ class Client
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(min={2}, max={255})
-     *
+     * @Assert\Length(
+     *     min={2},
+     *     max={255},
+     *     minMessage="Nom trop court minimum 3 caracteres",
+     *     maxMessage="Non trop long maximum 255 caracteres")
+     * @Assert\Regex(
+     *     pattern="/([A-ZÀ-ÿ][a-z]*)+[ ]([A-ZÀ-ÿ][a-z]*)/",
+     *     message="Entrer un nom valide")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(min={2}, max={255})
+     * @Assert\Email(message="email incorrect")
      *
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Length(min={2}, max={255})
+     * @Assert\Length(
+     *     min={2},
+     *     max={255},
+     *     minMessage="pseudo trop court minimum 3 caracteres",
+     *     maxMessage="pseudo trop long maximum 255 caracteres")
+     * @Assert\Regex (pattern="/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/",
+     *     message="Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%")
+     * @Assert\NotCompromisedPassword(message="mot de passe non sécurisé")
      */
     private $pseudo;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(min={8})
-     *
+     * @Assert\Regex (pattern="/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/",
+     *     message="Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%")
+     * @Assert\NotCompromisedPassword(message="mot de passe non sécurisé")
      */
     private $mdp;
+
+    /**
+     * @Assert\EqualTo(propertyPath="password", message="Le premier mot de passe ne correspond pas au premier mot de passe")
+     */
+    private $passwordVerify;
+
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -143,6 +163,22 @@ class Client
         $this->adresse = $adresse;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPasswordVerify()
+    {
+        return $this->passwordVerify;
+    }
+
+    /**
+     * @param mixed $passwordVerify
+     */
+    public function setPasswordVerify($passwordVerify): void
+    {
+        $this->passwordVerify = $passwordVerify;
     }
 
     public function __toString()

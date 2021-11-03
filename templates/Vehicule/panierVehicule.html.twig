@@ -1,7 +1,7 @@
 {% extends "base.html.twig" %}
 {% block body %}
     <div class="row">
-        {% if %}
+        {% if Vehicules | length > 0 %}
 
         {% else %}
             <h2 class="modal-title">Votre panier est vide !!</h2>
