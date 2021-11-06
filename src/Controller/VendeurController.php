@@ -31,6 +31,13 @@ class VendeurController extends AbstractController
     }
 
     /**
+     * @Route("/Vendeur/Services", name="vendeur_services")
+     */
+    public function services() {
+        return $this->render('Vendeur/vendeurAllService.html.twig');
+    }
+
+    /**
      * @Route("/Vendeur/connexion", name="vendeur_connexion")
      */
     public function connexionVendeur() {

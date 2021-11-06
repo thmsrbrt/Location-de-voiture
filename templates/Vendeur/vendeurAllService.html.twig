@@ -1,0 +1,13 @@
+{% extends 'base.html.twig'%}
+{% block body %}
+    <div class="row">
+        <h1>Liste des services pour les vendeurs</h1>
+        <ul>
+            <li><a href="{{ path('vendeur_vehicule_add') }}">Ajouter un véhicule</a></li>
+            <li><a href="{{ path('vendeur_vehicule_disponible') }}">Liste des véhicules disponibles</a></li>
+            <li><a href="{{ path('vendeur_vehicule_indisponible') }}">Liste des véhicules indisponibles</a></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+{% endblock %}
