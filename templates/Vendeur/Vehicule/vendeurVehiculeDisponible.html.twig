@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="row">
+    {% if  vehicules is defined %}
+        <h1>Voiture disponible</h1>
+        <h3 class="text-center">Ajouter un <a href="{{ path('vendeur_vehicule_add') }}">vehicule</a> au catalogue</h3>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Image</th>
+                <th class="col">Caractéristiques</th>
+                <th scope="col">Disponibilité</th>
+                <th class="col">Service</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for vehicule in vehicules %}
+                    <tr>
+                        <th>{{ vehicule.id }}</th>
+                        <td>{{ vehicule.name }}</td>
+                        <td><img src="http://127.0.0.1:8000{{ vehicule.photo }}" style="height: 60px;" alt="{{ vehicule.name }}">{{ vehicule.photo }}</td>
+                        <td>{{ vehicule.caracteres }}</td>
+                        <td>{% if vehicule.etat == true %}
+                                oui
+                                {% else %}
+                                nom
+                            {% endif %}</td>
+                        <td>
+                            <button type="button" class="btn btn-warning">
+                                <a href="{{ path('vendeur_vehicule_rendre_indisponible', {'id': vehicule.id}) }}">Indisponible</a>
+                            </button>
+                            <button type="button" class="btn btn-danger">
+                                <a href="{{ path('vendeur_vehicule_supprimer', {'id': vehicule.id}) }}">Supprimer</a>
+                            </button>
+                        </td>
+                    </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <th class="">Nombre de véhicule disponible : {{ data.nbVehicule | default('') }}</th>
+                <th></th>
+                <th class="">Total : {{ data.nbTotal | default('') }}</th>
+                <th><a href="{{ path('vendeur_vehicule_indisponible') }}">vehicules indisponible</a></th>
+            </tfoot>
+        </table>
+    {% else %}
+        <h2>Aucun véhicule enregistré dans la base</h2>
+    {% endif %}
+</div>
+{% endblock %}

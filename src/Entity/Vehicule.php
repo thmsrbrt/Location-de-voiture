@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\VehiculeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=VehiculeRepository::class)
@@ -20,15 +21,14 @@ class Vehicule
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $type;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $nombre;
+    private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\File(
+     *     maxSize="10M",
+     *     maxSizeMessage="fichier trop volumineux"
+     * )
      */
     private $photo;
 
@@ -40,7 +40,7 @@ class Vehicule
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $caractere;
+    private $caracteres;
 
 
     public function getId(): ?int
@@ -48,37 +48,24 @@ class Vehicule
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getName(): ?string
     {
-        return $this->type;
+        return $this->name;
     }
 
-    public function setType(string $type): self
+    public function setName(string $name): self
     {
-        $this->type = $type;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getNombre(): ?int
-    {
-        return $this->nombre;
-    }
-
-    public function setNombre(int $nombre): self
-    {
-        $this->nombre = $nombre;
-
-        return $this;
-    }
-
-
-    public function getPhoto(): ?string
+    public function getPhoto()
     {
         return $this->photo;
     }
 
-    public function setPhoto(string $photo): self
+    public function setPhoto($photo)
     {
         $this->photo = $photo;
 
@@ -97,14 +84,14 @@ class Vehicule
         return $this;
     }
 
-    public function getCaractere(): ?string
+    public function getCaracteres(): ?string
     {
-        return $this->caractere;
+        return $this->caracteres;
     }
 
-    public function setCaractere(string $caractere): self
+    public function setCaracteres(string $caracteres): self
     {
-        $this->caractere = $caractere;
+        $this->caracteres = $caracteres;
 
         return $this;
     }
@@ -113,9 +100,8 @@ class Vehicule
     public function __toString()
     {
         // TODO: Implement __toString() method.
-        return "type : " . $this->getType().
-            "nombre : " . $this->getNombre().
-            "caractere : " . $this->getCaractere().
+        return "type : " . $this->getName().
+            "caractere : " . $this->getCaracteres().
             "photo : " . $this->getPhoto().
             "etat : " . $this->getEtat();
     }

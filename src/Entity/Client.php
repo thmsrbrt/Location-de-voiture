@@ -6,12 +6,13 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
  */
-class Client
+class Client implements PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -55,17 +56,16 @@ class Client
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Regex (pattern="/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/",
+     * @Assert\Regex (pattern="/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/",
      *     message="Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%")
      * @Assert\NotCompromisedPassword(message="mot de passe non sécurisé")
      */
-    private $mdp;
+    private $password;
 
     /**
      * @Assert\EqualTo(propertyPath="password", message="Le premier mot de passe ne correspond pas au premier mot de passe")
      */
     private $passwordVerify;
-
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -129,14 +129,14 @@ class Client
         return $this;
     }
 
-    public function getMdp(): ?string
+    public function getPassword(): ?string
     {
-        return $this->mdp;
+        return $this->password;
     }
 
-    public function setMdp(string $mdp): self
+    public function setPassword(string $password): self
     {
-        $this->mdp = $mdp;
+        $this->password = $password;
 
         return $this;
     }
@@ -174,27 +174,6 @@ class Client
     }
 
     /**
-     * @param mixed $passwordVerify
-     */
-    public function setPasswordVerify($passwordVerify): void
-    {
-        $this->passwordVerify = $passwordVerify;
-    }
-
-    public function __toString()
-    {
-        // TODO: Implement __toString() method.
-        return "nom : ". $this->getNom().
-            "prenom : ". $this->getPrenom().
-            "pseudom : ". $this->getPrenom().
-            "mdp : ". $this->getMdp().
-            "email : ". $this->getEmail().
-            "adresse : ". $this->getAdresse();
-        }
-
-
-
-    /**
      * @return Collection|Facture[]
      */
     public function getFactures(): Collection
@@ -223,4 +202,23 @@ class Client
 
         return $this;
     }
+
+    /**
+     * @param mixed $passwordVerify
+     */
+    public function setPasswordVerify($passwordVerify): void
+    {
+        $this->passwordVerify = $passwordVerify;
+    }
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return "nom : ". $this->getNom().
+            "prenom : ". $this->getPrenom().
+            "pseudom : ". $this->getPrenom().
+            "mdp : ". $this->getPassword().
+            "email : ". $this->getEmail().
+            "adresse : ". $this->getAdresse();
+        }
 }

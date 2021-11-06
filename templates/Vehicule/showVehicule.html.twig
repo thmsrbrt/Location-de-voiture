@@ -4,10 +4,10 @@
         {% if vehicules is not empty %}
             {% for vehicule in vehicules %}
                 <div class="col-8 border border-1">
-                    <h3 class="text-center">{{ vehicule.type | default('') }}</h3>
-                    <img class="embed-responsive-item rounded mx-auto d-block" src="{{ app.request.basePath }}{{ vehicule.photo }}" height="300px" alt="{{ vehicule.type }}">
-                    <p class="">{{ vehicule.caractere }} <br>{% if (vehicule.etat) %} disponible {% else %} indisponible {% endif %}</p>
-                    <p class="text-lg-start">Nombre de véhicule disponible : {{ vehicule.nombre }}</p>
+                    <h3 class="text-center">{{ vehicule.name | default('') }}</h3>
+                    <img class="embed-responsive-item rounded mx-auto d-block" src="{{ app.request.basePath }}{{ vehicule.photo }}" height="300px" alt="{{ vehicule.name }}">
+                    <p class="">{{ vehicule.caracteres }} <br>{% if (vehicule.etat) %} disponible {% else %} indisponible {% endif %}</p>
+                    <p class="text-lg-start">Nombre de véhicule disponible : </p>
                 </div>
             {% endfor %}
         {% else %}

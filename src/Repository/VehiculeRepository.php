@@ -19,11 +19,21 @@ class VehiculeRepository extends ServiceEntityRepository
         parent::__construct($registry, Vehicule::class);
     }
 
+    public function findByEtat($etat) {
+        return $this->createQueryBuilder('v')
+            ->andWhere('v.etat = :etat')
+            ->setParameter('etat', $etat)
+            ->orderBy('v.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findAllVehicule() {
         $conexion = $this->getEntityManager()->getConnection();
-        $requete = "SELECT type, nombre, caractere, photo, etat
+        $requete = "SELECT name, caracteres, photo, etat
         FROM Vehicule 
-        ORDER BY type";
+        ORDER BY name";
         try {
             $prep = $conexion->prepare($requete);
             $prep->execute();

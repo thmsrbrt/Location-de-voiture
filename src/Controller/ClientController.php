@@ -4,23 +4,15 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Repository\ClientRepository;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use Symfony\Component\BrowserKit\CookieJar;
-use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use function PHPUnit\Framework\isEmpty;
 
 
 class ClientController extends AbstractController {
-    private $requestStack;
 
-    public function __construct(RequestStack $requestStack){
-        $this->requestStack = $requestStack;
-    }
+    public function __construct(){}
 
     /**
      * @Route("/Client", name="client_error")
@@ -32,90 +24,86 @@ class ClientController extends AbstractController {
     /**
      * @Route("/Client/inscription", name="client_inscription")
      */
-    public function inscriptionClient(){
+    public function inscriptionClient(SessionInterface $session){
+        if ($session != null)
+            $session->clear();
+
         return $this->render('Client/inscriptionClient.html.twig');
     }
 
     /**
      * @Route("/Client/connexion", name="client_connexion")
      */
-    public function connexionClient(){
+    public function connexionClient(SessionInterface $session){
+        if ($session != null)
+            $session->clear();
         return $this->render('Client/connexionClient.html.twig');
     }
 
     /**
      * @Route("/Client/edit", name="client_edit")
      */
-    public function editClient(ClientRepository $client){
-        //$donnees = $client->findOneBy();
-        //dd($donnees);
-        $donnees = null;
+    public function editClient(ClientRepository $client, SessionInterface $session){
+        $donnees = $client->find($session->get('id'));
         return $this->render('Client/editClient.html.twig', ['donnees' => $donnees]);
     }
 
     /**
      * @Route("Client/{id}/suppression", name="client_suppression")
      */
-    public function suppressionClient( $id){
+    public function suppressionClient(ClientRepository $client, SessionInterface $session){
         $entityManager = $this->getDoctrine()->getManager();
-        $client = $entityManager->getRepository(Client::class)->find($id);
+        $id = $session->get('id');
+        $client = $client->find($id);
 
         if (!$client){
             throw $this->createNotFoundException('client non trouve'.$id);
-        }
-
-        if (isEmpty($client)){
+        } else {
             $entityManager->remove($client);
             $entityManager->flush();
         }
         return $this->redirectToRoute('controller_show_vehicule');
     }
-/*
+
     /**
-     * @Route("Client/valideConnexion", name="client_valide_connexion")
-
-    public function valideConnexionClient(){
-        $donnees['email'] = htmlentities($_POST['email']);
-        $donnees['password'] = htmlentities($_POST['password']);
-
-        if (!empty($donnees['email']) and !empty($donnees['password'])){
-            if (empty($this->getDoctrine()->getRepository(Client::class)->findOneBy(['email' => $donnees['email'], 'mdp' => $donnees['password']]))) {
-                $errors['connexion'] = "Email ou mot de passe incorrect";
-                return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
-            } else
-                return $this->redirectToRoute('controller_show_vehicule');
-        } else
-            return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees]);
+     * @Route("/Client/deconnection", name="client_logout")
+     */
+    public function logout(SessionInterface $session) {
+        if ($session != null) {
+            $session->clear();
+        }
+        return $this->redirectToRoute('controller_show_vehicule');
     }
-*/
 
     /**
      * @Route("Client/valideConnexion", name="client_valide_connexion")
      */
-    public function valideConnexionClient(ClientRepository $client){
+    public function valideConnexionClient(ClientRepository $client, SessionInterface $session)
+    {
         $donnees['email'] = htmlentities($_POST['email']);
         $donnees['password'] = htmlentities($_POST['password']);
 
-        if (!empty($donnees['email']) and !empty($donnees['password'])){
-            if (!empty($client->findOneBy(['email' => $donnees['email'], 'mdp' => $donnees['password']]))) {
-                $session = $this->requestStack->getSession();
-                $session->set('email', $donnees['email']);
-                $session->set('password', $donnees['password']);
-                dd($session);
-                return $this->redirectToRoute('controller_show_vehicule');
-            } else {
-                $errors['connexion'] = "Email ou mot de passe incorrect";
-                //dd($donnees);
-                return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
-            }
-        } else
-            return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees]);
+        $errors = $this->valideFormConnexion($donnees);
+
+        if (empty($errors['errors'])) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $client = $this->getDoctrine()->getRepository(Client::class)->findOneBy(['email' => $donnees['email']]);
+            if ($client != null) {
+                if ($client->getPassword() == $donnees['password']) {
+                    $this->setSession($session, $client);
+                    return $this->redirectToRoute('controller_show_vehicule');
+                } else
+                    $errors['connexion'] = "Mot de passe incorrect";
+            } else
+                $errors['connexion'] = "Email incorrect";
+        }
+        return $this->render('Client/connexionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
     }
 
     /**
      * @Route("Client/valideFormClient", name="client_valide_form_client")
      */
-    public function validateInscriptionClient()
+    public function validateInscriptionClient(SessionInterface $session)
     {
         $donnees['nom'] = htmlentities($_POST['nom']);
         $donnees['prenom'] = htmlentities($_POST['prenom']);
@@ -125,61 +113,97 @@ class ClientController extends AbstractController {
         $donnees['passwordVerify'] = htmlentities($_POST['passwordVerify']);
 
         $errors = $this->valideFormClient($donnees);
-
-        if (empty($errors)) {
+        if (empty($errors['errors'])) {
             $entityManager = $this->getDoctrine()->getManager();
-            $new_client = new Client();
+            if ($entityManager->getRepository(Client::class)->findOneBy(['email' => $donnees['email']]) == null)
+                $new_client = new Client();
+            else
+                $new_client = $entityManager->getRepository(Client::class)->findOneBy(['email' => $donnees['email']]);
+
             $new_client->setNom($donnees['nom']);
             $new_client->setPrenom($donnees['prenom']);
             if (!empty($donnees['pseudo']))
                 $new_client->setPseudo($donnees['pseudo']);
             $new_client->setEmail($donnees['email']);
-            $new_client->setMdp($donnees['password']);
+            $new_client->setPassword($donnees['password']);
             $entityManager->persist($new_client);
             $entityManager->flush();
-
-            // ne pas oublier l'enregistrment pour le cookie
-            return $this->redirectToRoute('controller_show_vehicule');// rettour vers l'accuil en gros mais en étant connecté
-
+            $this->setSession($session, $new_client);
+            return $this->redirectToRoute('controller_show_vehicule');
         }
         return $this->render('Client/inscriptionClient.html.twig', ['donnees' => $donnees, 'errors' => $errors]);
     }
 
-    public function valideFormClient($donnees):array {
+    public function valideFormClient(array $donnees):array {
         $errors = array();
         $good = "Correct !!";
-        if (!preg_match('/^[A-Za-z ]{2,}$/', $donnees['nom']))
+        if (!preg_match('/^[A-Za-z ]{2,}$/', $donnees['nom'])) {
+            $errors['errors'] = 1;
             $errors['nom'] = "Le nom doit comporter 2 caractères uniquement avec des lettres";
-        else
+        }else
             $errors['nom'] = $good;
 
-        if (!preg_match('/^[A-Za-z ]{2,}$/', $donnees['prenom']))
+        if (!preg_match('/^[A-Za-z ]{2,}$/', $donnees['prenom'])) {
+            $errors['errors'] = 1;
             $errors['prenom'] = "Le nom doit comporter 2 caractères uniquement avec des lettres";
-        else
+        }else
             $errors['prenom'] = $good;
 
-        if (!empty($donnees["pseudo"]) and $donnees['pseudo'] != ''){
-            if (!empty($this->getDoctrine()->getRepository(Client::class)->findOneBy(['pseudo' => $donnees['pseudo']])))
+        if (!empty($donnees["pseudo"]) and $donnees['pseudo'] != '') {
+            if (!empty($this->getDoctrine()->getRepository(Client::class)->findOneBy(['pseudo' => $donnees['pseudo']]))){
+                $errors['errors'] = 1;
                 $errors['pseudo'] = "Ce pseudo à déjà été utilisé";
-            else
+        }else
                 $errors['pseudo'] = $good;
         }
 
-        if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,12}$/', $donnees['password']))
+        if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/', $donnees['password'])){
+            $errors['errors'] = 1;
             $errors['password'] = "Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%";
-        else
+        } else
             $errors['password'] = $good;
 
-        if (!preg_match("%@%", $donnees["email"]))
+        if (!preg_match("%@%", $donnees["email"])) {
+            $errors['errors'] = 1;
             $errors['email'] = "Le format de l'email est incorrect";
-        else
+        } else
             $errors['email'] = $good;
 
-        if ($donnees['password'] != $donnees['passwordVerify'])
-            $errors['passwordVerify'] = "Les deux mots de passe ne sont pas cohérent";
-        else
+        if ($donnees['password'] != $donnees['passwordVerify']) {
+            $errors['errors'] = 1;
+            $errors['passwordVerify'] = "Les mots de passe ne sont pas identiques";
+        } else
             $errors['passwordVerify'] = $good;
 
         return $errors;
+    }
+
+    private function valideFormConnexion(array $donnees):array
+    {
+        $errors = array();
+        $good = "Correct !!";
+        if (!preg_match("%@%", $donnees["email"])) {
+            $errors['errors'] = 1;
+            $errors['email'] = "Le format de l'email est incorrect";
+        } else
+        $errors['email'] = $good;
+
+        if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/', $donnees['password'])){
+            $errors['errors'] = 1;
+            $errors['password'] = "Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%";
+        } else
+            $errors['password'] = $good;
+
+        return $errors;
+    }
+
+    private function setSession(SessionInterface $session, Client $client) {
+        $session->clear();
+        $session->set('id', $client->getId());
+        $session->set('nom', $client->getNom());
+        $session->set('prenom', $client->getPrenom());
+        $session->set('pseudo', $client->getPseudo());
+        $session->set('email', $client->getEmail());
+        $session->set('password', $client->getPassword());
     }
 }

@@ -33,12 +33,12 @@ class Facture
     private $etatR;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="factures")
+     * @ORM\Column(type="integer")
      */
     private $idC;
 
     /**
-     * @ORM\OneToOne(targetEntity=Vehicule::class, cascade={"persist", "remove"})
+     * @ORM\Column(type="integer")
      */
     private $idV;
 
@@ -88,24 +88,24 @@ class Facture
         return $this;
     }
 
-    public function getIdC(): ?Client
+    public function getIdC(): ?int
     {
         return $this->idC;
     }
 
-    public function setIdC(?Client $idC): self
+    public function setIdC(int $idC): self
     {
         $this->idC = $idC;
 
         return $this;
     }
 
-    public function getIdV(): ?Vehicule
+    public function getIdV(): ?int
     {
         return $this->idV;
     }
 
-    public function setIdV(?Vehicule $idV): self
+    public function setIdV(int $idV): self
     {
         $this->idV = $idV;
 

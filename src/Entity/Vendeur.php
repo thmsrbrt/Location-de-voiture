@@ -30,7 +30,7 @@ class Vendeur
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $mdp;
+    private $password;
 
     public function getId(): ?int
     {
@@ -61,14 +61,14 @@ class Vendeur
         return $this;
     }
 
-    public function getMdp(): ?string
+    public function getPassword(): ?string
     {
-        return $this->mdp;
+        return $this->password;
     }
 
-    public function setMdp(string $mdp): self
+    public function setPassword(string $password): self
     {
-        $this->mdp = $mdp;
+        $this->password = $password;
 
         return $this;
     }
@@ -78,6 +78,6 @@ class Vendeur
         // TODO: Implement __toString() method.
         return "nom : ". $this->getNom().
             "identifiant : ". $this->getIdentifiant().
-            "mdp : ". $this->getMdp();
+            "mdp : ". $this->getPassword();
     }
 }
