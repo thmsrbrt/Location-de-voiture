@@ -89,8 +89,8 @@ class AppFixtures extends Fixture
         ];
         foreach ($tab_factures as $facture) {
             $new_facture = new Facture();
-            $new_facture->setIdC($facture["idC"]);
-            $new_facture->setIdV($facture["idV"]);
+            $new_facture->setIdC($manager->getRepository(Client::class)->find($facture["idC"]));
+            $new_facture->setIdV($manager->getRepository(Vehicule::class)->find($facture["idV"]));
             $new_facture->setDateD(\DateTime::createFromFormat('Y-m-d', $facture["dateD"]));
             $new_facture->setDateF(\DateTime::createFromFormat('Y-m-d',$facture["dateF"]));
             $new_facture->setEtatR($facture["etatR"]);

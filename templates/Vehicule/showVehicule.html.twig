@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block body %}
     <div class="row">
+        {% if message is defined %}
+            <h2 class="alerte">{{ message }}</h2>
+        {% endif %}
         {% if vehicules is not empty %}
             {% for vehicule in vehicules %}
                 <div class="col-8 border border-1">

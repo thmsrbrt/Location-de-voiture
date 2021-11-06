@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Repository\ClientRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -44,25 +43,30 @@ class ClientController extends AbstractController {
      * @Route("/Client/edit", name="client_edit")
      */
     public function editClient(ClientRepository $client, SessionInterface $session){
+        if ($session->get('id' ) == null)
+            return $this->redirectToRoute('client_connexion');
         $donnees = $client->find($session->get('id'));
         return $this->render('Client/editClient.html.twig', ['donnees' => $donnees]);
     }
 
     /**
-     * @Route("Client/{id}/suppression", name="client_suppression")
+     * @Route("Client/suppression", name="client_suppression")
      */
     public function suppressionClient(ClientRepository $client, SessionInterface $session){
         $entityManager = $this->getDoctrine()->getManager();
         $id = $session->get('id');
         $client = $client->find($id);
 
-        if (!$client){
-            throw $this->createNotFoundException('client non trouve'.$id);
-        } else {
+        if ($client != null){
             $entityManager->remove($client);
             $entityManager->flush();
+            $session->clear();
+            $message = "Votre compte a bien été supprimé";
         }
-        return $this->redirectToRoute('controller_show_vehicule');
+        else
+            $message = "Erreur lors de la suppression";
+
+        return $this->redirectToRoute('controller_show_vehicule', ['message' => $message]);
     }
 
     /**
@@ -78,15 +82,13 @@ class ClientController extends AbstractController {
     /**
      * @Route("Client/valideConnexion", name="client_valide_connexion")
      */
-    public function valideConnexionClient(ClientRepository $client, SessionInterface $session)
-    {
+    public function valideConnexionClient(SessionInterface $session) {
         $donnees['email'] = htmlentities($_POST['email']);
         $donnees['password'] = htmlentities($_POST['password']);
 
         $errors = $this->valideFormConnexion($donnees);
 
         if (empty($errors['errors'])) {
-            $entityManager = $this->getDoctrine()->getManager();
             $client = $this->getDoctrine()->getRepository(Client::class)->findOneBy(['email' => $donnees['email']]);
             if ($client != null) {
                 if ($client->getPassword() == $donnees['password']) {
@@ -103,12 +105,12 @@ class ClientController extends AbstractController {
     /**
      * @Route("Client/valideFormClient", name="client_valide_form_client")
      */
-    public function validateInscriptionClient(SessionInterface $session)
-    {
+    public function validateInscriptionClient(SessionInterface $session) {
         $donnees['nom'] = htmlentities($_POST['nom']);
         $donnees['prenom'] = htmlentities($_POST['prenom']);
         $donnees['pseudo'] = htmlentities($_POST['pseudo']);
         $donnees['email'] = htmlentities($_POST['email']);
+        $donnees['adresse'] = htmlentities($_POST['adresse']);
         $donnees['password'] = htmlentities($_POST['password']);
         $donnees['passwordVerify'] = htmlentities($_POST['passwordVerify']);
 
@@ -125,7 +127,9 @@ class ClientController extends AbstractController {
             if (!empty($donnees['pseudo']))
                 $new_client->setPseudo($donnees['pseudo']);
             $new_client->setEmail($donnees['email']);
+            $new_client->setAdresse($donnees['adresse']);
             $new_client->setPassword($donnees['password']);
+
             $entityManager->persist($new_client);
             $entityManager->flush();
             $this->setSession($session, $new_client);
@@ -148,6 +152,12 @@ class ClientController extends AbstractController {
             $errors['prenom'] = "Le nom doit comporter 2 caractères uniquement avec des lettres";
         }else
             $errors['prenom'] = $good;
+
+        if (!preg_match('/^[A-Za-z ]{2,}$/', $donnees['adresse'])) {
+            $errors['errors'] = 1;
+            $errors['adresse'] = "Adresse incorrect";
+        }else
+            $errors['adresse'] = $good;
 
         if (!empty($donnees["pseudo"]) and $donnees['pseudo'] != '') {
             if (!empty($this->getDoctrine()->getRepository(Client::class)->findOneBy(['pseudo' => $donnees['pseudo']]))){
@@ -189,7 +199,6 @@ class ClientController extends AbstractController {
         $errors['email'] = $good;
 
         if (!preg_match('/^(?=.*\d)(?=.*[A-Za-z])[0-9A-Za-z!@#$%]{8,20}$/', $donnees['password'])){
-            $errors['errors'] = 1;
             $errors['password'] = "Mot de passe non sécurité, il doit contenir 8 caractères minimum et avoir un caractère spécial parmi ! @ # $%";
         } else
             $errors['password'] = $good;
@@ -204,6 +213,7 @@ class ClientController extends AbstractController {
         $session->set('prenom', $client->getPrenom());
         $session->set('pseudo', $client->getPseudo());
         $session->set('email', $client->getEmail());
+        $session->set('adresse', $client->getAdresse());
         $session->set('password', $client->getPassword());
     }
 }

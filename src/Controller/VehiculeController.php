@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Entity\Vehicule;
 use App\Repository\VehiculeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -27,10 +25,13 @@ class VehiculeController extends AbstractController
     /**
      * @Route("/", name="controller_show_vehicule")
      */
-    public function showAllVehicules(){
+    public function showAllVehicules(SessionInterface $session){
         $vehicule = $this->getDoctrine()->getRepository(Vehicule::class)->findAll();
-        //dd($vehicule);
-        return $this->render('Vehicule/showVehicule.html.twig', ['vehicules' => $vehicule]);
+        if ($session != null)
+            $info = true;
+        else
+            $info = false;
+        return $this->render('Vehicule/showVehicule.html.twig', ['vehicules' => $vehicule, 'info' => $info]);
     }
 
     /**
@@ -78,31 +79,5 @@ class VehiculeController extends AbstractController
         $session->set('panier', $panier);
         return $this->redirectToRoute("panier_vehicule");
     }
-
-    /**
-     * @Route("/Vehicule/locations", name="locations_vehicule")
-     */
-    public function showVehiculeEnLocations(){
-
-    }
-
-    /*
-     *
-     *
-     *
-     * formulaire ajout modification de véjhicule par les admin
-     */
-    public function vendeurVehicule(){
-
-    }
-
-    /**
-     * @Route("/Véhicule/deleted/{id}", name="deleted_vehicule")
-     */
-    public function vendeurDeleteVehicule(){
-
-    }
-
-
 
 }

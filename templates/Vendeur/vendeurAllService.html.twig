@@ -1,12 +1,14 @@
 {% extends 'base.html.twig'%}
 {% block body %}
     <div class="row">
-        <h1>Liste des services pour les vendeurs</h1>
+        <h1 style="margin-top: 10px">Liste des services pour les vendeurs</h1>
         <ul>
-            <li><a href="{{ path('vendeur_vehicule_add') }}">Ajouter un véhicule</a></li>
-            <li><a href="{{ path('vendeur_vehicule_disponible') }}">Liste des véhicules disponibles</a></li>
-            <li><a href="{{ path('vendeur_vehicule_indisponible') }}">Liste des véhicules indisponibles</a></li>
-            <li></li>
+            <li><a class="link-primary" href="{{ path('vendeur_connexion') }}">Connexion vendeur</a></li>
+            <li><a class="link-primary" href="{{ path('vendeur_logout') }}">Déconnexion vendeur</a></li>
+            <li><a class="link-primary" href="{{ path('vendeur_vehicule_add') }}">Ajouter un véhicule</a></li>
+            <li><a class="link-primary" href="{{ path('vendeur_vehicule_disponible') }}">Liste des véhicules disponibles</a></li>
+            <li><a class="link-primary" href="{{ path('vendeur_vehicule_indisponible') }}">Liste des véhicules indisponibles</a></li>
+            <li><a class="link-primary" href="{{ path('client_facture') }}">Factures des entreprises du mois dernier</a></li>
             <li></li>
         </ul>
     </div>

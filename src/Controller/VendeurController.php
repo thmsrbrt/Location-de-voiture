@@ -3,16 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Vehicule;
+use App\Entity\Vendeur;
 use App\Form\VehiculeType;
 use App\Repository\ClientRepository;
 use App\Repository\FactureRepository;
 use App\Repository\VehiculeRepository;
-use App\Repository\VendeurRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\UnicodeString;
@@ -25,8 +24,10 @@ class VendeurController extends AbstractController
 
     /**
      * @Route("/Vendeur", name="vendeur_index")
+     * @Route("/Vendeur/Vehicule", name="vendeur_vehicule")
      */
-    public function index() {
+    public function index(): \Symfony\Component\HttpFoundation\RedirectResponse
+    {
         return $this->redirectToRoute('vendeur_connexion');
     }
 
@@ -47,12 +48,14 @@ class VendeurController extends AbstractController
     /**
      * @Route("Vendeur/valideConnexion", name="vendeur_valide_connexion")
      */
-    public function valideConnexionVendeur(VendeurRepository $vendeur) {
+    public function valideConnexionVendeur(SessionInterface $session, Vendeur $vendeur) {
         $donnees['identifiant'] = htmlentities($_POST['identifiant']);
         $donnees['mdp'] = htmlentities($_POST['password']);
 
         if (!empty($donnees['identifiant']) and !empty($donnees['mdp'])) {
-            if (!empty($vendeur->findOneBy(['identifiant' => $donnees['identifiant'], 'password' => $donnees['mdp']]))) {
+            $vendeurRepository = $this->getDoctrine()->getRepository(Vendeur::class);
+            if (!empty($vendeurRepository->findOneBy(['identifiant' => $donnees['identifiant'], 'password' => $donnees['mdp']]))) {
+                $this->setSessions($session, $vendeur);
                 return $this->redirectToRoute('vendeur_vehicule_disponible');
             } else {
                 $errors['connexion'] = true;
@@ -83,8 +86,16 @@ class VendeurController extends AbstractController
         $donnees = $vehiculeRepository->findByEtat(0);
         $data['nbVehicule'] = count($donnees);
         $data['nbTotal'] = count($vehiculeRepository->findAll());
+        $client = $factureRepository->findBy(['idV' => $donnees[0]->getId()]);
+        //dd($facture);
+        /*
+        for ($i=0; $i < count($donnees); $i++) {
+            $a = $clientRepository->find($client[$i]->getIdC())->getId();
+            $donnees[$i]['idC'] = $a;
+            $donnees[$i]['NomClient'] = $clientRepository->find($client[$i]->getIdC())->getNom();
+        }
+        */
 
-        $client = null;
 
         return $this->render('Vendeur/Vehicule/vendeurVehiculeIndisponible.html.twig', ['vehicules' => $donnees, 'data' => $data, 'clients' => $client]);
     }
@@ -168,6 +179,25 @@ class VendeurController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('vendeur_vehicule_disponible');
+    }
+
+    /**
+     * @Route("/Vendeur/logout", name="vendeur_logout")
+     */
+    public function logout(SessionInterface $session) {
+        $session->clear();
+        return $this->render('Vendeur/connexionVendeur.html.twig');
+    }
+
+    /**
+     * Fonction pour enregistrer une session vendeur
+     */
+    private function setSessions(SessionInterface $session, Vendeur $vendeur) {
+        $session->clear();
+        $session->set('id', $vendeur->getId());
+        $session->set('nom', $vendeur->getNom());
+        $session->set('identifiant', $vendeur->getIdentifiant());
+        $session->set('password', $vendeur->getPassword());
     }
 
 }

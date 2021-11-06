@@ -3,16 +3,16 @@
     <div class="row">
         <form action="{{ path('vendeur_valide_connexion') }}" method="post" class="row g-3 needs-validation">
             <fieldset class="form-group">
-                <div class="col-md-4">
-                    <p>1956 eric1234</p>
+                <div class="col">
                     <legend>Connection vendeur</legend>
+                    <p class="small">1956 eric1234</p>
                     <label class="form-label">Identifiant vendeur :
-                        <input class="form-control" type="number" name="identifiant" size="18" value="" required>
+                        <input type="number" name="identifiant" placeholder="123456" size="18" value="" required>
                     </label>
                 </div>
-                <div class="col-md-4">
+                <div class="col">
                     <label class="form-label">Mot de passe :
-                        <input class="form-control" type="password" name="password" size="18" value="" >
+                        <input type="password" name="password" placeholder="" size="18" value="" >
                     </label>
                 </div>
                 {% if errors is defined %}

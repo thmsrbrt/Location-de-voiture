@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Repository\ClientRepository;
+use App\Repository\FactureRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
-class FactureController
+class FactureController extends AbstractController
 {
     public function __construct()
     {
@@ -19,12 +23,15 @@ class FactureController
     }
 
     /**
-     * @Route("Facture/mesfacture", name="client_facture")
+     * @Route("Facture/client", name="client_facture")
      */
-    public function showAllFactures(){
+    public function factureClient(ClientRepository $client, FactureRepository $repository, SessionInterface $session){
+        $id = $session->get('id');
+        $client = $client->find($id);
+        $factures = $repository->findBy(['idC' => $client]);
 
+        return $this->render('Facture/factureClient.html.twig', ['factures' => $factures ]);
     }
-
 
 
 }

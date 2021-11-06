@@ -11,30 +11,7 @@
                         <li><a class="dropdown-item" href="{{ path('client_inscription') }}">Inscription</a></li>
                         <li><a class="dropdown-item" href="{{ path('client_edit') }}">Modifier mon compte</a></li>
                         <li><a class="dropdown-item" href="{{ path('client_logout') }}">Se déconnecter</a></li>
-
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Voiture
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                        <li><a class="dropdown-item" href="#"></a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Autre</a>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-                        <li>
-                            <a class="dropdown-item" href="#"></a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">Another action</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </li>
+                        <li><a class="dropdown-item" href="{{ path('client_suppression') }}">Supprimer mon compte</a></li>
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
@@ -48,11 +25,11 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item">
-
-                    <a href="{{ path('panier_vehicule') }}" class="nav-link">Panier</a>
-                </li>
             </ul>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-outline-light me-2" ><a href="{{ path('client_connexion') }}">Se connecter</a></button>
+            <button type="button" class="btn btn-light"><a href="{{ path('client_inscription') }}">Inscription</a></button>
         </div>
     </div>
 </nav>
