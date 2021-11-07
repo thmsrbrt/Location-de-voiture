@@ -82,10 +82,10 @@ class AppFixtures extends Fixture
 
     public function load_Facture($manager) {
         $tab_factures = [
-            ['id' => 1, 'idC' => 1, 'idV' => 4, "dateD" => "2020-1-1", "dateF" => "2021-1-1", "etatR" => "1", "valeur" => 4000 ],
-            ['id' => 4, 'idC' => 1, 'idV' => 2, "dateD" => "2020-1-1", "dateF" => "2021-1-1", "etatR" => "1", "valeur" => 5000 ],
-            ['id' => 2, 'idC' => 3, 'idV' => 1, "dateD" => "2020-1-30", "dateF" => "2020-9-1", "etatR" => "0", "valeur" => 4000 ],
-            ['id' => 3, 'idC' => 2, 'idV' => 5, "dateD" => "2020-2-15", "dateF" => "2020-5-1", "etatR" => "1", "valeur" => 4000 ],
+            ['id' => 1, 'idC' => 1, 'idV' => 4, "dateD" => "2020-1-1", "dateF" => "2021-10-15", "etatR" => "1", "valeur" => 4000 ],
+            ['id' => 4, 'idC' => 2, 'idV' => 2, "dateD" => "2020-1-1", "dateF" => "2021-11-10", "etatR" => "1", "valeur" => 5000 ],
+            ['id' => 2, 'idC' => 3, 'idV' => 1, "dateD" => "2020-1-30", "dateF" => "2021-11-8", "etatR" => "0", "valeur" => 4000 ],
+            ['id' => 3, 'idC' => 2, 'idV' => 5, "dateD" => "2020-2-15", "dateF" => "2021-10-30", "etatR" => "1", "valeur" => 4000 ],
         ];
         foreach ($tab_factures as $facture) {
             $new_facture = new Facture();

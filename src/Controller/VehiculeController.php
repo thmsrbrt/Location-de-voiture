@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Vehicule;
+use App\Repository\ClientRepository;
 use App\Repository\VehiculeRepository;
-use PhpParser\JsonDecoder;
+use App\Services\Services;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 class VehiculeController extends AbstractController
 {
@@ -35,8 +33,7 @@ class VehiculeController extends AbstractController
             $info = true;
         else
             $info = false;
-        $donnees = $this->getDonneesVehicules($vehicules);
-        //dd($donnees);
+        $donnees = Services::getDonneesVehicules($vehicules);
         return $this->render('Vehicule/showVehicule.html.twig', ['vehicules' => $donnees ,'info' => $info]);
     }
 
@@ -52,7 +49,6 @@ class VehiculeController extends AbstractController
                 'quantity' => $quantity
             ];
         }
-
         return $this->render('Vehicule/panierVehicule.html.twig', ['Vehicules' => $donnees]);
     }
 
@@ -61,14 +57,11 @@ class VehiculeController extends AbstractController
      */
     public function addVehiculePanier($id , SessionInterface $session){
         $panier = $session->get('panier', []);
-
         if (!empty($panier[$id]))
             $panier[$id]++;
         else
             $panier[$id] = 1;
-
         $session->set('panier', $panier);
-        //dd($session->get('panier'));
         $this->redirectToRoute("controller_show_vehicule");
     }
 
@@ -77,32 +70,24 @@ class VehiculeController extends AbstractController
      */
     public function removeVehiculePanier($id, SessionInterface $session) {
         $panier = $session->get('panier',  []);
-
         if (!empty($panier[$id])) {
             unset($panier[$id]);
         }
-
         $session->set('panier', $panier);
         return $this->redirectToRoute("panier_vehicule");
     }
 
     /**
-     * @param array $vehicules
-     * @return array
+     * @Route("/Vehicule/disponibleReservation", name="vehicule_disponible_reservation")
      */
-    public function getDonneesVehicules(array $vehicules): array
-    {
-        $i = 0;
-        foreach ($vehicules as $vehicule) {
-            $donnees[$i]['id'] = $vehicule->getId();
-            $donnees[$i]['name'] = $vehicule->getName();
-            $donnees[$i]['photo'] = $vehicule->getPhoto();
-            $donnees[$i]['etat'] = $vehicule->getEtat();
-            $eee = json_decode($vehicule->getCaracteres());
-            $donnees[$i]['caracteres'] = $eee[0];
-            $i++;
-        }
-        return $donnees;
+    public function vehiculedisponibleReservation(VehiculeRepository $vehiculeRepository, ClientRepository $client, SessionInterface $session) {
+        $id = $session->get('id');
+        if ($id != null) {
+            $client = $client->findOneBy(['id' => $id]);
+            $vehicules = $vehiculeRepository->findByEtat(1);
+            $donnees = Services::getDonneesVehicules($vehicules);
+            return $this->render('Vehicule/disponibleReservation.html.twig', ['client' => $client, 'vehicules' => $donnees]);
+        } else
+            return $this->redirectToRoute('client_connexion');
     }
-
 }

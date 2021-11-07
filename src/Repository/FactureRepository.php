@@ -30,6 +30,28 @@ class FactureRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findFactureLast($Month){
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.dateF > :val')
+            ->setParameter('val', $Month)
+            ->orderBy('f.idC', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findFactureClientLast($date, $client){
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.dateF > :val')
+            ->andWhere('f.idC = :val2')
+            ->setParameter('val', $date)
+            ->setParameter('val2', $client)
+            ->orderBy('f.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
     // /**
     //  * @return Facture[] Returns an array of Facture objects
     //  */

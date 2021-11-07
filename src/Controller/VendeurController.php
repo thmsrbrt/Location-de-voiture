@@ -3,11 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Vehicule;
-use App\Entity\Vendeur;
 use App\Form\VehiculeType;
 use App\Repository\ClientRepository;
 use App\Repository\FactureRepository;
 use App\Repository\VehiculeRepository;
+use App\Repository\VendeurRepository;
+use App\Services\Services;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,16 +30,8 @@ class VendeurController extends AbstractController
      * @Route("/Vendeur", name="vendeur_index")
      * @Route("/Vendeur/Vehicule", name="vendeur_vehicule")
      */
-    public function index(): \Symfony\Component\HttpFoundation\RedirectResponse
-    {
+    public function index(){
         return $this->redirectToRoute('vendeur_connexion');
-    }
-
-    /**
-     * @Route("/Vendeur/Services", name="vendeur_services")
-     */
-    public function services() {
-        return $this->render('Vendeur/vendeurAllService.html.twig');
     }
 
     /**
@@ -51,14 +44,13 @@ class VendeurController extends AbstractController
     /**
      * @Route("Vendeur/valideConnexion", name="vendeur_valide_connexion")
      */
-    public function valideConnexionVendeur(SessionInterface $session, Vendeur $vendeur) {
+    public function valideConnexionVendeur(SessionInterface $session, VendeurRepository $vendeurRepository) {
         $donnees['identifiant'] = htmlentities($_POST['identifiant']);
         $donnees['mdp'] = htmlentities($_POST['password']);
-
         if (!empty($donnees['identifiant']) and !empty($donnees['mdp'])) {
-            $vendeurRepository = $this->getDoctrine()->getRepository(Vendeur::class);
-            if (!empty($vendeurRepository->findOneBy(['identifiant' => $donnees['identifiant'], 'password' => $donnees['mdp']]))) {
-                $this->setSessions($session, $vendeur);
+            $vendeur = $vendeurRepository->findOneBy(['identifiant' => $donnees['identifiant'], 'password' => $donnees['mdp']]);
+            if (!empty($vendeur)) {
+                Services::setSessions($session, $vendeur);
                 return $this->redirectToRoute('vendeur_vehicule_disponible');
             } else {
                 $errors['connexion'] = true;
@@ -75,11 +67,9 @@ class VendeurController extends AbstractController
      */
     public function vehiculeDisponible(VehiculeRepository $vehiculeRepository) {
         $vehicules = $vehiculeRepository->findByEtat(1);
-        $donnees = $this->getDonneesVehicules($vehicules);
-        //dd($donnees);
+        $donnees = Services::getDonneesVehicules($vehicules);
         $data['nbVehicule'] = count($vehicules);
         $data['nbTotal'] = count($vehiculeRepository->findAll());
-
         return $this->render('Vendeur/Vehicule/vendeurVehiculeDisponible.html.twig', ['vehicules' => $donnees, 'data' => $data] );
     }
 
@@ -88,7 +78,7 @@ class VendeurController extends AbstractController
      */
     public function vehiculeIndisponible(FactureRepository $factureRepository, ClientRepository $clientRepository, VehiculeRepository $vehiculeRepository) {
         $vehicules = $this->getDoctrine()->getRepository(Vehicule::class)->findByEtat(0);
-        $donnees = $this->getDonneesVehicules($vehicules);
+        $donnees = Services::getDonneesVehicules($vehicules);
         $data['nbVehicule'] = count($vehicules);
         $data['nbTotal'] = count($vehiculeRepository->findAll());
         $client = $factureRepository->findBy(['idV' => $vehicules[0]->getId()]);
@@ -100,7 +90,6 @@ class VendeurController extends AbstractController
             $donnees[$i]['NomClient'] = $clientRepository->find($client[$i]->getIdC())->getNom();
         }
         */
-
         return $this->render('Vendeur/Vehicule/vendeurVehiculeIndisponible.html.twig', ['vehicules' => $donnees, 'data' => $data, 'clients' => $client]);
     }
 
@@ -110,7 +99,6 @@ class VendeurController extends AbstractController
     public function addVehicule(Request $request, SluggerInterface $slugger) {
         $vehicule = new Vehicule();
         $form = $this->createForm(VehiculeType::class, $vehicule);
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $photo = $form->get('photo')->getData();
@@ -119,7 +107,6 @@ class VendeurController extends AbstractController
                 $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
                 $newFilename = $safeFilename.'-'.uniqid().'.'.$photo->guessExtension();
-
                 try {
                     $photo->move(
                         $this->getParameter('vehicule_directory'),
@@ -131,16 +118,13 @@ class VendeurController extends AbstractController
                 $chemin = '/Images/Voitures/'.$newFilename;
                 $vehicule->setPhoto($chemin);
             }
-            //dd($caracteres);
             $encoders = [new JsonEncoder()];
             $normalizers = [new ObjectNormalizer()];
             $serializer = new Serializer($normalizers, $encoders);
             $texte = "{".(new UnicodeString($caracteres))
                 ->replace("\r\n", ' , ')
                 ->replace(' : ', " => ")."}";
-            //dd($texte);
             $texte = $serializer->serialize($texte, 'json');
-            //dd($texte);
 
             $jsonCaracteres = json_encode($texte);
             //dd($jsonCaracteres);
@@ -152,15 +136,13 @@ class VendeurController extends AbstractController
             $em->flush();
             return $this->redirectToRoute('vendeur_vehicule_disponible');
         }
-
         return $this->render('Vendeur/Vehicule/vendeurAddVehicule.html.twig', array('formvehicule' => $form->createView()));
     }
 
     /**
      * @Route("/Vendeur/Vehicule/rendreIndisponible/{id}", name="vendeur_vehicule_rendre_indisponible")
      */
-    public function rendreIndisponible(Vehicule $vehicule)
-    {
+    public function rendreIndisponible(Vehicule $vehicule) {
         $vehicule->setEtat(0);
         $em = $this->getDoctrine()->getManager();
         $em->persist($vehicule);
@@ -208,35 +190,4 @@ class VendeurController extends AbstractController
         $session->clear();
         return $this->render('Vendeur/connexionVendeur.html.twig');
     }
-
-    /**
-     * Fonction pour enregistrer une session vendeur
-     */
-    private function setSessions(SessionInterface $session, Vendeur $vendeur) {
-        $session->clear();
-        $session->set('id', $vendeur->getId());
-        $session->set('nom', $vendeur->getNom());
-        $session->set('identifiant', $vendeur->getIdentifiant());
-        $session->set('password', $vendeur->getPassword());
-    }
-
-    /**
-     * @param array $vehicules
-     * @return array
-     */
-    public function getDonneesVehicules(array $vehicules): array
-    {
-        $i = 0;
-        foreach ($vehicules as $vehicule) {
-            $donnees[$i]['id'] = $vehicule->getId();
-            $donnees[$i]['name'] = $vehicule->getName();
-            $donnees[$i]['photo'] = $vehicule->getPhoto();
-            $donnees[$i]['etat'] = $vehicule->getEtat();
-            $eee = json_decode($vehicule->getCaracteres());
-            $donnees[$i]['caracteres'] = $eee[0];
-            $i++;
-        }
-        return $donnees;
-    }
-
 }

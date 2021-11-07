@@ -20,7 +20,7 @@ class Facture
     /**
      * @ORM\Column(type="date")
      */
-    private $DateF;
+    private $dateF;
 
     /**
      * @ORM\Column(type="integer")
@@ -54,12 +54,12 @@ class Facture
 
     public function getDateF(): ?\DateTimeInterface
     {
-        return $this->DateF;
+        return $this->dateF;
     }
 
-    public function setDateF(\DateTimeInterface $DateF): self
+    public function setDateF(\DateTimeInterface $dateF): self
     {
-        $this->DateF = $DateF;
+        $this->dateF = $dateF;
 
         return $this;
     }
