@@ -1,10 +1,5 @@
 - Respecter la nomination de l'archive, comme suit:
-  (initial de votre chargé de TP) suivi de
-  (initial du nom du projet)  suivi de
-  (répéter grp nom et prénom pour couvrir tous les membres de votre équipe)
-  JMI_LocationVoiture_n°Grp-nom-prenom
-  LD_LocationVoiture_n°Grp-nom-prenom
-  FK_LocationVoiture_n°Grp-nom-prenom
+  FK_LocationVoiture_n°Grp-robert-thomas
 
 - Mettre au 1er niveau de l'archive,
   le fichier .sql de description de la base. La base doit contenir des données.

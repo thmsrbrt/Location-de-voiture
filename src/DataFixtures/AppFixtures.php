@@ -25,11 +25,11 @@ class AppFixtures extends Fixture
 
     public function load_Vehicules($manager) {
         $tab_vehicules = [
-            ['id'=>1, "type" => "Peugeot 508", "caractere" => "moteur : hdi, nbPortes : 5, couleur : noire, option : hybrid, 'carburant' : diesel✅, 'autre' : null }", "photo" => "/Images/Voitures/508-noir-perla-nera.jpg", "etat" => '0'],
-            ['id'=>2, "type" => "Peugeot 3008", "caractere" => "'moteur':rouge : eeeee", "photo" => "/Images/Voitures/peugeot-3008-bmw-q3-115.jpg", "etat" => "1"],
-            ['id'=>3, "type" => "Peugeot 5008", "caractere" => "'moteur':bleu magnétique", "photo" => "/Images/Voitures/peugeot-5008-2009styp-016b.jpg", "etat" => "1"],
-            ['id'=>4, "type" => "Peugeot 208", "caractere" => "'moteur':jaune eeeee", "photo" => "/Images/Voitures/Peugeot_208_GT_Line.jpeg", "etat" => "1"],
-            ['id'=>5, "type" => "DS", "caractere" => "'moteur' :la ds du garage", "photo" => "/Images/Voitures/S0-salon-de-geneve-2020-ds-presente-la-ds9-622618.jpg", "etat" => "1"],
+            ['id'=>1, "type" => "Peugeot 508", "caractere" => "[{\"moteur\" : \"hdi\", \"nbPortes\" : 5, \"couleur\" : \"noire\", \"option\" : \"cuire\", \"carburant\" : \"diesel\", \"autre\" : null }]", "photo" => "/Images/Voitures/508-noir-perla-nera.jpg", "etat" => '0'],
+            ['id'=>2, "type" => "Peugeot 3008", "caractere" => "[{\"moteur\" : \"hdi2\", \"nbPortes\" : 5, \"couleur\" : \"rouge\", \"option\" : \"GPS\", \"carburant\" : \"diesel\", \"autre\" : null }]", "photo" => "/Images/Voitures/peugeot-3008-bmw-q3-115.jpg", "etat" => "1"],
+            ['id'=>3, "type" => "Peugeot 5008", "caractere" => "[{\"moteur\" : \"4.6l\", \"nbPortes\" : 5, \"couleur\" : \"bleu magnétique\", \"option\" : \"roue de secours\", \"carburant\" : \"diesel\", \"autre\" : null }]", "photo" => "/Images/Voitures/peugeot-5008-2009styp-016b.jpg", "etat" => "1"],
+            ['id'=>4, "type" => "Peugeot 208", "caractere" => "[{\"moteur\" : \"hybrid\", \"nbPortes\" : 3, \"couleur\" : \"jaune moutarde\", \"option\" : \"cuire\", \"carburant\" : \"diesel\", \"autre\" : null }]", "photo" => "/Images/Voitures/Peugeot_208_GT_Line.jpeg", "etat" => "1"],
+            ['id'=>5, "type" => "DS", "caractere" => "[{\"moteur\" : \"electrique\", \"nbPortes\" : 5, \"couleur\" : \"gris\", \"option\" : \"chargeurs\", \"carburant\" : \"electrique\", \"autre\" : null }]", "photo" => "/Images/Voitures/S0-salon-de-geneve-2020-ds-presente-la-ds9-622618.jpg", "etat" => "1"],
 
         ];
         foreach ($tab_vehicules as $vehicule) {

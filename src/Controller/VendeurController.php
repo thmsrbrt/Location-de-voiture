@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\UnicodeString;
 
@@ -71,9 +74,10 @@ class VendeurController extends AbstractController
      * @Route("/Vendeur/Vehicule/disponible", name="vendeur_vehicule_disponible")
      */
     public function vehiculeDisponible(VehiculeRepository $vehiculeRepository) {
-        $donnees = $vehiculeRepository->findByEtat(1);
+        $vehicules = $vehiculeRepository->findByEtat(1);
+        $donnees = $this->getDonneesVehicules($vehicules);
         //dd($donnees);
-        $data['nbVehicule'] = count($donnees);
+        $data['nbVehicule'] = count($vehicules);
         $data['nbTotal'] = count($vehiculeRepository->findAll());
 
         return $this->render('Vendeur/Vehicule/vendeurVehiculeDisponible.html.twig', ['vehicules' => $donnees, 'data' => $data] );
@@ -83,10 +87,11 @@ class VendeurController extends AbstractController
      * @Route("/Vendeur/Vehicule/indisponible", name="vendeur_vehicule_indisponible")
      */
     public function vehiculeIndisponible(FactureRepository $factureRepository, ClientRepository $clientRepository, VehiculeRepository $vehiculeRepository) {
-        $donnees = $vehiculeRepository->findByEtat(0);
-        $data['nbVehicule'] = count($donnees);
+        $vehicules = $this->getDoctrine()->getRepository(Vehicule::class)->findByEtat(0);
+        $donnees = $this->getDonneesVehicules($vehicules);
+        $data['nbVehicule'] = count($vehicules);
         $data['nbTotal'] = count($vehiculeRepository->findAll());
-        $client = $factureRepository->findBy(['idV' => $donnees[0]->getId()]);
+        $client = $factureRepository->findBy(['idV' => $vehicules[0]->getId()]);
         //dd($facture);
         /*
         for ($i=0; $i < count($donnees); $i++) {
@@ -96,11 +101,9 @@ class VendeurController extends AbstractController
         }
         */
 
-
         return $this->render('Vendeur/Vehicule/vendeurVehiculeIndisponible.html.twig', ['vehicules' => $donnees, 'data' => $data, 'clients' => $client]);
     }
 
-    //fonction qui permet ajouter des vehicules
     /**
      * @Route("/Vendeur/Vehicule/add", name="vendeur_vehicule_add")
      */
@@ -111,6 +114,7 @@ class VendeurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $photo = $form->get('photo')->getData();
+            $caracteres = $form->get('caracteres')->getData();
             if ($photo) {
                 $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
                 $safeFilename = $slugger->slug($originalFilename);
@@ -127,6 +131,22 @@ class VendeurController extends AbstractController
                 $chemin = '/Images/Voitures/'.$newFilename;
                 $vehicule->setPhoto($chemin);
             }
+            //dd($caracteres);
+            $encoders = [new JsonEncoder()];
+            $normalizers = [new ObjectNormalizer()];
+            $serializer = new Serializer($normalizers, $encoders);
+            $texte = "{".(new UnicodeString($caracteres))
+                ->replace("\r\n", ' , ')
+                ->replace(' : ', " => ")."}";
+            //dd($texte);
+            $texte = $serializer->serialize($texte, 'json');
+            //dd($texte);
+
+            $jsonCaracteres = json_encode($texte);
+            //dd($jsonCaracteres);
+            $jsonCaracteres = $serializer->serialize($texte, 'json');
+
+            $vehicule->setCaracteres($texte);
             $em = $this->getDoctrine()->getManager();
             $em->persist($vehicule);
             $em->flush();
@@ -198,6 +218,25 @@ class VendeurController extends AbstractController
         $session->set('nom', $vendeur->getNom());
         $session->set('identifiant', $vendeur->getIdentifiant());
         $session->set('password', $vendeur->getPassword());
+    }
+
+    /**
+     * @param array $vehicules
+     * @return array
+     */
+    public function getDonneesVehicules(array $vehicules): array
+    {
+        $i = 0;
+        foreach ($vehicules as $vehicule) {
+            $donnees[$i]['id'] = $vehicule->getId();
+            $donnees[$i]['name'] = $vehicule->getName();
+            $donnees[$i]['photo'] = $vehicule->getPhoto();
+            $donnees[$i]['etat'] = $vehicule->getEtat();
+            $eee = json_decode($vehicule->getCaracteres());
+            $donnees[$i]['caracteres'] = $eee[0];
+            $i++;
+        }
+        return $donnees;
     }
 
 }

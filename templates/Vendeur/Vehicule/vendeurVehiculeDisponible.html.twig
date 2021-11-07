@@ -19,8 +19,17 @@
                     <tr>
                         <th>{{ vehicule.id }}</th>
                         <td>{{ vehicule.name }}</td>
-                        <td><img src="http://127.0.0.1:8000{{ vehicule.photo }}" style="height: 60px;" alt="{{ vehicule.name }}">{{ vehicule.photo }}</td>
-                        <td>{{ vehicule.caracteres }}</td>
+                        <td><img src="{{ app.request.basePath }}{{ vehicule.photo }}" style="height: 100px;" alt="{{ vehicule.name }}">{{ vehicule.photo }}</td>
+                        <td>
+                            <lu>
+                                <li>Moteur :{{ vehicule.caracteres.moteur }}</li>
+                                <li>Nombre de portes : {{ vehicule.caracteres.nbPortes }}</li>
+                                <li>Couleur : {{ vehicule.caracteres.couleur }}</li>
+                                <li>Options : {{ vehicule.caracteres.option }}</li>
+                                <li>Carburant : {{ vehicule.caracteres.carburant }}</li>
+                                <li>Autres : {{ vehicule.caracteres.autre }}</li>
+                            </lu>
+                        </td>
                         <td>{% if vehicule.etat == true %}
                                 oui
                                 {% else %}

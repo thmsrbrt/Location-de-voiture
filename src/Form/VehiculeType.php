@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -34,10 +35,10 @@ class VehiculeType extends AbstractType
                 ],
                 'required' => true,
             ])
-            ->add('caracteres', TextType::class, [
+            ->add('caracteres', TextareaType::class, [
                 'attr' => [
-                    'placeholder' => 'Nom du véhicule'
-                ],
+                    'placeholder' => 'Caractéristique du véhicule moteur : nom',
+                    'rows' => '5',],
                 'required' => true
             ])
             ->add('submit', SubmitType::class, [

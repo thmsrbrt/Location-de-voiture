@@ -4,9 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Vehicule;
 use App\Repository\VehiculeRepository;
+use PhpParser\JsonDecoder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class VehiculeController extends AbstractController
 {
@@ -26,12 +30,14 @@ class VehiculeController extends AbstractController
      * @Route("/", name="controller_show_vehicule")
      */
     public function showAllVehicules(SessionInterface $session){
-        $vehicule = $this->getDoctrine()->getRepository(Vehicule::class)->findAll();
+        $vehicules = $this->getDoctrine()->getRepository(Vehicule::class)->findAll();
         if ($session != null)
             $info = true;
         else
             $info = false;
-        return $this->render('Vehicule/showVehicule.html.twig', ['vehicules' => $vehicule, 'info' => $info]);
+        $donnees = $this->getDonneesVehicules($vehicules);
+        //dd($donnees);
+        return $this->render('Vehicule/showVehicule.html.twig', ['vehicules' => $donnees ,'info' => $info]);
     }
 
     /**
@@ -78,6 +84,25 @@ class VehiculeController extends AbstractController
 
         $session->set('panier', $panier);
         return $this->redirectToRoute("panier_vehicule");
+    }
+
+    /**
+     * @param array $vehicules
+     * @return array
+     */
+    public function getDonneesVehicules(array $vehicules): array
+    {
+        $i = 0;
+        foreach ($vehicules as $vehicule) {
+            $donnees[$i]['id'] = $vehicule->getId();
+            $donnees[$i]['name'] = $vehicule->getName();
+            $donnees[$i]['photo'] = $vehicule->getPhoto();
+            $donnees[$i]['etat'] = $vehicule->getEtat();
+            $eee = json_decode($vehicule->getCaracteres());
+            $donnees[$i]['caracteres'] = $eee[0];
+            $i++;
+        }
+        return $donnees;
     }
 
 }

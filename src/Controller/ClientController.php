@@ -55,6 +55,9 @@ class ClientController extends AbstractController {
     public function suppressionClient(ClientRepository $client, SessionInterface $session){
         $entityManager = $this->getDoctrine()->getManager();
         $id = $session->get('id');
+        if ($id == null){
+            return $this->redirectToRoute('controller_show_vehicule', ['message' => 'Erreur lors de la suppression']);
+        }
         $client = $client->find($id);
 
         if ($client != null){

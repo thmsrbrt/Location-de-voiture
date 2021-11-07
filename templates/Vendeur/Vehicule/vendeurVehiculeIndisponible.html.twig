@@ -21,17 +21,30 @@
                         <tr>
                             <th>{{ vehicule.id }}</th>
                             <td>{{ vehicule.name }}</td>
-                            <td><img src="http://127.0.0.1:8000{{ vehicule.photo }}" style="height: 60px;" alt="{{ vehicule.name }}">{{ vehicule.photo }}</td>
-                            <td>{%  set a = vehicule.caracteres|split(',') %}{% for e in a%} <ul><li>{{ e }}</li></ul> {% endfor %}</td>
+                            <td><img src="{{ app.request.basePath }}{{ vehicule.photo }}" style="height: 100px;" alt="{{ vehicule.name }}">{{ vehicule.photo }}</td>
+                            <td>
+                                <lu>
+                                    <li>Moteur :{{ vehicule.caracteres.moteur }}</li>
+                                    <li>Nombre de portes : {{ vehicule.caracteres.nbPortes }}</li>
+                                    <li>Couleur : {{ vehicule.caracteres.couleur }}</li>
+                                    <li>Options : {{ vehicule.caracteres.option }}</li>
+                                    <li>Carburant : {{ vehicule.caracteres.carburant }}</li>
+                                    <li>Autres : {{ vehicule.caracteres.autre }}</li>
+                                </lu>
+                            </td>
                             <td></td>
                             <td></td>
                             <td>
-                                <button type="button" class="btn btn-success">
-                                    <a href="{{ path('vendeur_vehicule_rendre_disponible', {'id': vehicule.id}) }}">Disponible</a>
-                                </button>
-                                <button type="button" class="btn btn-danger">
-                                    <a href="{{ path('vendeur_vehicule_supprimer', {'id': vehicule.id}) }}">Supprimer</a>
-                                </button>
+                                <div class="btn-block">
+                                    <button type="button" class="btn btn-success">
+                                        <a href="{{ path('vendeur_vehicule_rendre_disponible', {'id': vehicule.id}) }}">Disponible</a>
+                                    </button>
+                                </div>
+                                <div class="btn-block">
+                                    <button type="button" class="btn btn-danger">
+                                        <a href="{{ path('vendeur_vehicule_supprimer', {'id': vehicule.id}) }}">Supprimer</a>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
