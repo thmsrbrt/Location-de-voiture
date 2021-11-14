@@ -1,29 +1,47 @@
-//Récupérer les dépendances
-Composer require orm-fixtures --dev
-Composer require admin
+# Projet de location de voiture
+Ce site permet de consulter les véhicules de l'agence de location et de réserver des véhicules disponibles avec un compte client. Les vendeurs peuvent aussi créer des annonces de location de voiture, rendre indisponible un véhicule et également d'en supprimer.
+Chaque location de voiture crée une facture consultable par le client concerné et les vendeurs.
 
-//Vérifier les dépendances
-symfony check:requirements
+# Pour commencer
+Télécharger les sources du projet.
 
-//Connecter votre base de donnée dans le fichier .env
+## Pré-requis
+- avoir un serveur **Apache**
+- avoir un serveur **MySQL**
+- avoir **PHP**
+- avoir **composer** et **symfony**
 
-//Exécuter ce fichier pour vider, créer les tables et réaliser les enregistrements
-sh schemaUpdateFixture.sh
+## Installation
+Vérifier les dépendances :
+`symfony check:requirements`
 
-//Regarder le sql généré :
-php bin/console doctrine:schema:update  --dump-sql
+Récupérer les dépendances (manquantes):
+ - `Composer require orm-fixtures --dev`
+ - `Composer require admin`
+ - `composer require symfony/webpack-encore-bundle`
 
-//Exécuter le sql
-php bin/console doctrine:schema:update  --force
+Connecter votre base de donnée dans le fichier **.env**
 
-//lister les version php
-symfony local:php:list
+Exécuter ce fichier pour supprimer, créer les tables et réaliser les enregistrements :
+`sh schemaUpdateFixture.sh`
 
-//Changer de version php si besoin
-echo version > .php-version
+Afficher le sql généré :
+`php bin/console doctrine:schema:update  --dump-sql`
 
-//Démarrer le projet en http
-Symfony server:start --no-tls
+Exécuter le sql :
+`php bin/console doctrine:schema:update  --force`
 
-//Stopper le server
-Symfony server:stop
+lister les version php :
+`symfony local:php:list`
+
+Changer de version php si besoin :
+`echo version > .php-version`
+
+Démarrer le projet en https :
+`Symfony server:start`
+
+Stopper le server
+`Symfony server:stop`
+
+# Licenses
+Toutes images et sources dans le cadre de ce projet ont été utilisées à des fins éducatifs.  
