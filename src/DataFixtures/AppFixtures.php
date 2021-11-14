@@ -66,7 +66,7 @@ class AppFixtures extends Fixture
 
     public function load_Vendeurs($manager){
         $tab_vendeurs = [
-            ['id' => 1, "nom" => "Eric", "identifiant" => "1956", "mdp" => "eric1234"],
+            ['id' => 1, "nom" => "Eric", "identifiant" => "2000", "mdp" => "eric1234"],
             ['id' => 2, "nom" => "Isa", "identifiant" => "3", "mdp" => "bambou"],
         ];
         foreach ($tab_vendeurs as $vendeur) {
